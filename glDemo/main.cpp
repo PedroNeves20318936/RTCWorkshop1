@@ -13,6 +13,7 @@ void renderScene();
 void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
 void updateScene();
+void DrawPolygon(int _x, int _y, int _sides, float _radius);
 
 
 int main() {
@@ -58,6 +59,8 @@ int main() {
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
+	gluOrtho2D(10.0f, -10.0f, 10.0f, -10.0f);
+
 
 	//
 	// 2. Main loop
@@ -90,6 +93,38 @@ void renderScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Render objects here...
+	/*glBegin(GL_TRIANGLES);
+		glVertex2f(-1.0f, -1.0f);
+		glVertex2f(1.0f, 1.0f);
+		glVertex2f(1.0f, -1.0f);
+		glVertex2f(-1.0f, -1.0f);
+		glVertex2f(1.0f, 1.0f);
+		glVertex2f(-1.0f, 1.0f);
+	glEnd();*/
+
+	DrawPolygon(0, 0, 5, 3.0f);
+	DrawPolygon(1, 5, 3, 1.0f);
+	DrawPolygon(8, -5, 4, 2.0f);
+
+}
+
+void DrawPolygon(int _x, int _y, int _sides, float _radius)
+{
+	if (_sides < 3) return;
+
+	const float PI = 3.14159265359f;
+	float angleIncrement = 2.0f * PI / _sides;
+
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(_x, _y);
+
+	for (int i = 0; i <= _sides; ++i) {
+		float angle = i * angleIncrement;
+		float x = _x + _radius * cos(angle);
+		float y = _y + _radius * sin(angle);
+		glVertex2f(x, y);
+	}
+	glEnd();
 }
 
 
