@@ -1,6 +1,8 @@
 
 #include "core.h"
 
+#include <cmath>
+
 
 // global variables
 
@@ -14,6 +16,9 @@ void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
 void updateScene();
 void DrawPolygon(int _x, int _y, int _sides, float _radius);
+void drawStarDegrees(float _atX, float _atY, float _innerRadius, float _outerRadius, int _points);
+void drawTank(float _atX, float _atY, float r, float g, float b, float _orientation);
+
 
 
 int main() {
@@ -59,7 +64,7 @@ int main() {
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
-	gluOrtho2D(10.0f, -10.0f, 10.0f, -10.0f);
+	gluOrtho2D(-8.1f, 8.1f, -8.1f, 8.1f);
 
 
 	//
@@ -102,10 +107,13 @@ void renderScene()
 		glVertex2f(-1.0f, 1.0f);
 	glEnd();*/
 
-	DrawPolygon(0, 0, 5, 3.0f);
+	/*DrawPolygon(0, 0, 5, 3.0f);
 	DrawPolygon(1, 5, 3, 1.0f);
-	DrawPolygon(8, -5, 4, 2.0f);
+	DrawPolygon(8, -5, 4, 2.0f);*/
 
+	//drawStarDegrees(0.0f, 0.0f, 0.1f, 0.25f, 5);
+	drawTank(- 3.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.01f);
+	drawTank(+ 3.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.01f);
 }
 
 void DrawPolygon(int _x, int _y, int _sides, float _radius)
@@ -126,6 +134,58 @@ void DrawPolygon(int _x, int _y, int _sides, float _radius)
 	}
 	glEnd();
 }
+
+void drawStarDegrees(float _atX, float _atY, float _innerRadius, float _outerRadius, int _points)
+{
+	if (_points < 4) return;
+
+	const float PI = 3.14159265359f;
+	float angleStep = PI / _points;
+
+	glBegin(GL_TRIANGLE_FAN);
+
+	glColor3ub(255, 255, 255);
+	glVertex2f(_atX, _atY);
+
+	glColor3ub(0, 0, 0);
+
+	for (int i = 0; i <= _points * 2; i++) {
+		float angle = i * angleStep;
+		float radius = (i % 2 == 0) ? _outerRadius : _innerRadius;
+
+		float x = _atX + radius * cos(angle);
+		float y = _atY + radius * sin(angle);
+		glVertex2f(x, y);
+	}
+
+	glEnd();
+}
+
+void drawTank(float _atX, float _atY, float r, float g, float b, float _orientation)
+{
+	glBegin(GL_LINE_LOOP);
+
+	glColor3ub(255, 255, 255);
+	glVertex2f(_atX + -0.75f, _atY + 0.4f);
+	glVertex2f(_atX + 0.75f, _atY + 0.4f);
+	glVertex2f(_atX + 0.75f, _atY + -0.4f);
+	glVertex2f(_atX + -0.75f, _atY + -0.4f);
+
+	glEnd();
+
+	glBegin(GL_TRIANGLE_FAN);
+
+	glColor3ub(r, g, b);
+
+	glVertex2f(_atX + -0.5f, _atY + 0.3f);
+	glVertex2f(_atX + 0.5f, _atY + 0.0f);
+	glVertex2f(_atX + -0.5f, _atY + -0.3f);
+
+	glEnd();
+
+}
+
+
 
 
 // Function to call when window resized
