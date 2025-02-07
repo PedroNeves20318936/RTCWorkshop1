@@ -2,22 +2,25 @@
 #include "core.h"
 
 #include <cmath>
+#include "MyShapes.h"
 
 
 // global variables
 
 // Window size
-const unsigned int initWidth = 512;
-const unsigned int initHeight = 512;
+const unsigned int initWidth = 1012;
+const unsigned int initHeight = 1012;
 
 // Function prototypes
 void renderScene();
 void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
 void updateScene();
-void DrawPolygon(int _x, int _y, int _sides, float _radius);
+/*void DrawPolygon(int _x, int _y, int _sides, float _radius);
 void drawStarDegrees(float _atX, float _atY, float _innerRadius, float _outerRadius, int _points);
 void drawTank(float _atX, float _atY, float r, float g, float b, float _orientation);
+void drawBlendedRectangles();
+void drawSemiCircleStudio();*/
 
 
 
@@ -64,7 +67,7 @@ int main() {
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
-	gluOrtho2D(-8.1f, 8.1f, -8.1f, 8.1f);
+	gluOrtho2D(-2.1f, 2.1f, -2.1f, 2.1f);
 
 
 	//
@@ -111,12 +114,14 @@ void renderScene()
 	DrawPolygon(1, 5, 3, 1.0f);
 	DrawPolygon(8, -5, 4, 2.0f);*/
 
-	//drawStarDegrees(0.0f, 0.0f, 0.1f, 0.25f, 5);
-	drawTank(- 3.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.01f);
-	drawTank(+ 3.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.01f);
+	//drawStarDegrees(0.0f, 0.0f, 1.0f, 3.0f, 5);
+	//drawTank(- 3.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f);
+	//drawTank(+ 3.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.01f);
+	//drawBlendedRectangles();
+	//drawSemiCircleStudio();
 }
 
-void DrawPolygon(int _x, int _y, int _sides, float _radius)
+/*void DrawPolygon(int _x, int _y, int _sides, float _radius)
 {
 	if (_sides < 3) return;
 
@@ -161,32 +166,125 @@ void drawStarDegrees(float _atX, float _atY, float _innerRadius, float _outerRad
 	glEnd();
 }
 
-void drawTank(float _atX, float _atY, float r, float g, float b, float _orientation)
-{
-	glBegin(GL_LINE_LOOP);
+void rotatePoint(float& x, float& y, float angle) {
+	float rad = angle * (3.14159265359f / 180.0f);
+	float cosTheta = cos(rad);
+	float sinTheta = sin(rad);
 
-	glColor3ub(255, 255, 255);
-	glVertex2f(_atX + -0.75f, _atY + 0.4f);
-	glVertex2f(_atX + 0.75f, _atY + 0.4f);
-	glVertex2f(_atX + 0.75f, _atY + -0.4f);
-	glVertex2f(_atX + -0.75f, _atY + -0.4f);
+	float newX = cosTheta * x - sinTheta * y;
+	float newY = sinTheta * x + cosTheta * y;
 
-	glEnd();
-
-	glBegin(GL_TRIANGLE_FAN);
-
-	glColor3ub(r, g, b);
-
-	glVertex2f(_atX + -0.5f, _atY + 0.3f);
-	glVertex2f(_atX + 0.5f, _atY + 0.0f);
-	glVertex2f(_atX + -0.5f, _atY + -0.3f);
-
-	glEnd();
-
+	x = newX;
+	y = newY;
 }
 
+void drawTank(float _atX, float _atY, float r, float g, float b, float _orientation)
+{
+	float vertices[][2] = {
+		{-0.75f,  0.4f}, { 0.75f,  0.4f}, { 0.75f, -0.4f}, {-0.75f, -0.4f},
+		{-0.5f,  0.3f}, { 0.5f,  0.0f}, {-0.5f, -0.3f}
+	};
 
+	glBegin(GL_LINE_LOOP);
+	glColor3ub(255, 255, 255);
+	for (int i = 0; i < 4; i++) {
+		rotatePoint(vertices[i][0], vertices[i][1], _orientation);
+		glVertex2f(_atX + vertices[i][0], _atY + vertices[i][1]);
+	}
+	glEnd();
 
+	glBegin(GL_TRIANGLES);
+	glColor3ub(r, g, b);
+	for (int i = 4; i < 7; i++) {
+		rotatePoint(vertices[i][0], vertices[i][1], _orientation);
+		glVertex2f(_atX + vertices[i][0], _atY + vertices[i][1]);
+	}
+	glEnd();
+}
+
+void drawBlendedRectangles()
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glBegin(GL_QUADS);
+	glVertex2f(-0.5f, 0.5f);
+	glVertex2f(0.5f, 0.5f);
+	glVertex2f(0.5f, 0.0f);
+	glVertex2f(-0.5f, 0.0f);
+	glEnd();
+
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glBegin(GL_QUADS);
+	glVertex2f(-0.2f, 0.7f);
+	glVertex2f(0.7f, 0.7f);
+	glVertex2f(0.7f, 0.2f);
+	glVertex2f(-0.2f, 0.2f);
+	glEnd();
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+	glVertex2f(0.0f, 0.8f);
+	glVertex2f(0.8f, 0.8f);
+	glVertex2f(0.8f, 0.3f);
+	glVertex2f(0.0f, 0.3f);
+	glEnd();
+
+	glDisable(GL_BLEND);
+}
+
+void drawSemiCircleStudio()
+{
+
+	glShadeModel(GL_FLAT);
+
+	glBegin(GL_TRIANGLE_STRIP);
+
+	glColor3ub(255, 0, 255);
+	glVertex2f(-0.25f, 0.0f);
+
+	glColor3ub(255, 255, 0);
+	glVertex2f(-0.75f, 0.0f);
+
+	glColor3ub(255, 0, 0);
+	glVertex2f(-0.216506351f, 0.125f);
+
+	glColor3ub(255, 0, 0);
+	glVertex2f(-0.649519053f, 0.375f);
+
+	glColor3ub(255, 255, 0);
+	glVertex2f(-0.125, 0.216506351f);
+
+	glColor3ub(255, 255, 0);
+	glVertex2f(-0.375f, 0.649519053f);
+
+	glColor3ub(0, 255, 0);
+	glVertex2f(0.0f, 0.25f);
+
+	glColor3ub(0, 255, 0);
+	glVertex2f(0.0f, 0.75f);
+
+	glColor3ub(0, 255, 255);
+	glVertex2f(0.125f, 0.216506351f);
+
+	glColor3ub(0, 255, 255);
+	glVertex2f(0.375f, 0.649519053f);
+
+	glColor3ub(0, 0, 255);
+	glVertex2f(0.216506351f, 0.125f);
+
+	glColor3ub(0, 0, 255);
+	glVertex2f(0.649519053f, 0.375f);
+
+	glColor3ub(255, 0, 255);
+	glVertex2f(0.25f, 0.0f);
+
+	glColor3ub(255, 0, 255);
+	glVertex2f(0.75f, 0.0f);
+
+	glEnd();
+}*/
 
 // Function to call when window resized
 void resizeWindow(GLFWwindow* window, int width, int height)
