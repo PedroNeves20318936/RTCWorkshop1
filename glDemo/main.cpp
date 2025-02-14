@@ -4,8 +4,19 @@
 #include <cmath>
 #include "MyShapes.h"
 
+using namespace std;
+
 
 // global variables
+
+mt19937 engine;
+uniform_real_distribution<float> range;
+uniform_real_distribution<float> colorRange;
+uniform_real_distribution<float> sizeRange;
+
+vector<glm::vec2> vertexCoords;
+vector<glm::vec4> vertexColors;
+vector<float> vertexSizes;
 
 // Window size
 const unsigned int initWidth = 1012;
@@ -67,8 +78,35 @@ int main() {
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
-	gluOrtho2D(-2.1f, 2.1f, -2.1f, 2.1f);
+	gluOrtho2D(-4.1f, 4.1f, -4.1f, 4.1f);
 
+	random_device rd;
+	engine = mt19937(rd());
+	range = uniform_real_distribution<float>(-1.0f, 1.0f);
+	colorRange = uniform_real_distribution<float>(0.0f, 1.0f);
+	sizeRange = uniform_real_distribution<float>(5.0f, 40.0f);
+
+	vertexCoords = vector<glm::vec2>(100, glm::vec2(0.0f, 0.0f));
+	vertexColors = vector<glm::vec4>(100, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	vertexSizes = vector<float>(100, 5.0f); 
+
+	// Iterate 100 times (once for each vertex) and calculate and store the random x and y values
+	for (int i = 0; i < 100; i++) {
+
+		float x = range(engine);
+		float y = range(engine);
+
+		float size = sizeRange(engine);
+
+		float r = colorRange(engine);
+		float g = colorRange(engine);
+		float b = colorRange(engine);
+		float a = 1.0f;
+
+		vertexCoords[i] = glm::vec2(x, y);
+		vertexColors[i] = glm::vec4(r, g, b, a);
+		vertexSizes[i] = size;
+	}
 
 	//
 	// 2. Main loop
@@ -100,6 +138,25 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//glPointSize(5.0f);
+	//glColor3ub(0, 180, 0);
+
+
+	// Render objects here...
+	for (int i = 0; i < 100; i++) 
+	{
+		glPointSize(vertexSizes[i]);
+		glBegin(GL_POINTS);
+		glColor4f(vertexColors[i].r, vertexColors[i].g, vertexColors[i].b, vertexColors[i].a);
+		glVertex2f(vertexCoords[i].x, vertexCoords[i].y);
+	}
+
+	glEnd();
+
+
+	// Clear the rendering window
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// Render objects here...
 	/*glBegin(GL_TRIANGLES);
 		glVertex2f(-1.0f, -1.0f);
@@ -110,13 +167,13 @@ void renderScene()
 		glVertex2f(-1.0f, 1.0f);
 	glEnd();*/
 
-	/*DrawPolygon(0, 0, 5, 3.0f);
-	DrawPolygon(1, 5, 3, 1.0f);
-	DrawPolygon(8, -5, 4, 2.0f);*/
+	//DrawPolygon(0, 0, 3, 3.0f);
+	//DrawPolygon(1, 5, 3, 1.0f);
+	//DrawPolygon(8, -5, 4, 2.0f);
 
 	//drawStarDegrees(0.0f, 0.0f, 1.0f, 3.0f, 5);
-	//drawTank(- 3.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f);
-	//drawTank(+ 3.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.01f);
+	//drawTank( 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f);
+	//drawTank(0.0f, 0.0f, 0.0f, 0.0f, 255.0f, 100.0f);
 	//drawBlendedRectangles();
 	//drawSemiCircleStudio();
 }
