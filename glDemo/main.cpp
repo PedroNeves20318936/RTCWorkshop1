@@ -143,15 +143,15 @@ void renderScene()
 
 
 	// Render objects here...
-	for (int i = 0; i < 100; i++) 
+	for (int i = 0; i < 100; i++)
 	{
 		glPointSize(vertexSizes[i]);
 		glBegin(GL_POINTS);
 		glColor4f(vertexColors[i].r, vertexColors[i].g, vertexColors[i].b, vertexColors[i].a);
 		glVertex2f(vertexCoords[i].x, vertexCoords[i].y);
+		glEnd();
 	}
 
-	glEnd();
 
 
 	// Clear the rendering window
